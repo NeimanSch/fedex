@@ -15,6 +15,6 @@ public class MainActivity extends AndroidApplication {
         cfg.useAccelerometer = true;
         cfg.useCompass = false;
         
-        initialize(new Fedex(), cfg);
+        initialize(new fedex(), cfg);
     }
 }

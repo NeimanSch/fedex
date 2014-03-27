@@ -11,7 +11,7 @@ public class Main {
 		cfg.width = 720;
 		cfg.height = 1280;
 		
-		new LwjglApplication(new Fedex(), cfg);
+		new LwjglApplication(new fedex(), cfg);
 	}
 }
  
