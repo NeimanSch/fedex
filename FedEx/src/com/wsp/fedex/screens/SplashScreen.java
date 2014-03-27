@@ -12,12 +12,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.wsp.fedex.fedex;
+import com.wsp.fedex.Fedex;
 import com.wsp.fedex.tween.SpriteAccessor;
 
 public class SplashScreen  implements Screen {
  
-	final fedex game;
+	final Fedex game;
 	
 	private SpriteBatch batch;
 	private Sprite splash;
@@ -26,7 +26,7 @@ public class SplashScreen  implements Screen {
 	
 	OrthographicCamera camera;
 	
-	public SplashScreen(final fedex gam){
+	public SplashScreen(final Fedex gam){
 		game = gam;
 		
 		camera = new OrthographicCamera();

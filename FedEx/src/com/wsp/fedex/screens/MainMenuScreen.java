@@ -4,15 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.wsp.fedex.fedex;
+import com.wsp.fedex.Fedex;
 
 public class MainMenuScreen implements Screen {
 	
-	final fedex game;
+	final Fedex game;
 	
 	OrthographicCamera camera;
 	
-	public MainMenuScreen(final fedex gam){
+	public MainMenuScreen(final Fedex gam){
 		game = gam;
 		
 		camera = new OrthographicCamera();

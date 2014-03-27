@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.wsp.fedex.screens.MainMenuScreen;
 import com.wsp.fedex.screens.SplashScreen;
 
-public class fedex extends Game {
+public class Fedex extends Game {
 	
 	public SpriteBatch batch;
 	

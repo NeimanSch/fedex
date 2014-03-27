@@ -18,13 +18,13 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.wsp.fedex.fedex;
+import com.wsp.fedex.Fedex;
 import com.wsp.fedex.ships.PlayerShip;
 import com.wsp.fedex.ships.EnemyShip;
 
 public class GameScreen implements Screen{
 	
-	final fedex game;
+	final Fedex game;
 	
 	Texture eship_1;
 	Texture pipe_o;
@@ -42,8 +42,8 @@ public class GameScreen implements Screen{
 	int maxBeams;
 	boolean useAccelerometer = true;
 
-	 public GameScreen(final fedex gam) {
-	        this.game = gam;
+	 public GameScreen(final Fedex gameIn) {
+	        this.game = gameIn;
 
 	        // load the images for the enemy ships and the player ship, 64x64 pixels each
 	        eship_1 = new Texture(Gdx.files.internal("img/eship_1.png"));
