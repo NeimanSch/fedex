@@ -104,7 +104,7 @@ public class GameScreen implements Screen{
 	        // coordinate system specified by the camera.
 	        game.batch.setProjectionMatrix(cam.combined);
 	        game.batch.begin();
-	        game.font.draw(game.batch, "Drops Collected: " + shipsDestroyed, 0, 1280);
+	        game.font.draw(game.batch, "Ships  Destroyed: " + shipsDestroyed, 0, 1280);
 	        game.batch.end();
 	        
 	        batch.setProjectionMatrix(cam.combined);
@@ -165,17 +165,28 @@ public class GameScreen implements Screen{
 	        // value our ships destroyed counter and add a sound effect.
 	        Iterator<Sprite> iter = fleet.iterator();
 	        while (iter.hasNext()) {
-	            Sprite eShip = iter.next();
+	        	Sprite eShip = iter.next();
+	        	Iterator<Sprite> beam_iter2 = beams.iterator();
+	        	while(beam_iter2.hasNext()){
+		        	Sprite beam2 = beam_iter2.next();
+		        	Gdx.app.log("fedex_beam_coll", "i made it");
+		        	if (eShip.getBoundingRectangle().overlaps(beam2.getBoundingRectangle())) {
+		        		shipsDestroyed++;
+		        		explosion.play();
+		        		iter.remove();
+		        		beam_iter2.remove();
+		        	}
+		        }
 	            eShip.translateY(-200 * Gdx.graphics.getDeltaTime());
 	            if ((eShip.getY() + 64) < 0)
 	                iter.remove();
-/*	            
-	            if (eShip.overlaps(ship)) {
+	            
+	            if (eShip.getBoundingRectangle().overlaps(ship.getBoundingRectangle())) {
 	                shipsDestroyed++;
 	                explosion.play();
 	                iter.remove();
 	        	}
-*/	        	
+	        	
 	        }
 	    }
 
