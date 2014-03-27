@@ -22,7 +22,7 @@ public class Beam {
 		
 		beam = new Sprite(phaser);
 		beam.setPosition(x, y);
-        beam.setSize(32,256);
+        beam.setSize(32,32);
 	}
 	
 	public void move() {

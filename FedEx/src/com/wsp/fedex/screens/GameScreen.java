@@ -2,6 +2,7 @@ package com.wsp.fedex.screens;
 
 
 import java.util.Iterator;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -11,11 +12,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.wsp.fedex.fedex;
@@ -38,15 +35,13 @@ public class GameScreen implements Screen{
 	long lastShipTime;
 	long lastBeamTime;
 	long lastEnemyBeamTime;
+	Random randomNum = new Random();
 	int shipsDestroyed;
 	int maxBeams;
 	boolean useAccelerometer = true;
 
-	 public GameScreen(final fedex gam) {
-	        this.game = gam;
-
-	        // load the images for the enemy ships and the player ship, 64x64 pixels each
-	       
+	 public GameScreen(final fedex game) {
+	        this.game = game;    
 
 	        // load the explosion sound effect and the ship engine
 	        explosion = Gdx.audio.newSound(Gdx.files.internal("sound/blasters.wav"));
@@ -105,7 +100,7 @@ public class GameScreen implements Screen{
 
 	        ship.move();
 	        
-	        // keep shooting
+	        // shoot on space or touch
 	        if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched()) && (TimeUtils.nanoTime() - lastBeamTime > 1000000000/5)){
 	        	ship.shoot();
 	        	lastBeamTime = TimeUtils.nanoTime();
@@ -120,27 +115,28 @@ public class GameScreen implements Screen{
 	        // value our ships destroyed counter and add a sound effect.
 	        Iterator<EnemyShip> iter = fleet.iterator();
 	        while (iter.hasNext()) {
-	        	EnemyShip eShip = iter.next();
-	        	if(TimeUtils.nanoTime() - lastEnemyBeamTime > 1000000000/2) {
-	        		eShip.shoot();
+	        	
+	        	EnemyShip enemy = iter.next();
+	        	if(enemy.readyToShoot) {
+	        		enemy.shoot();
 	        		lastEnemyBeamTime = TimeUtils.nanoTime();
 	        	}
-	        	if(eShip.checkBeamCollision(ship.getBeams())) {
+	        	if(enemy.checkBeamCollision(ship.getBeams())) {
 	        		shipsDestroyed++;
 	        		explosion.play();
 	        		iter.remove();
 	        		break;
 	        	}
-	        	if(ship.checkBeamCollision(eShip.getBeams())) {
+	        	if(ship.checkBeamCollision(enemy.getBeams())) {
 	        		explosion.play();
 	        		ship.loseHealth();
 	        	}
 	        	
-	        	eShip.move();
-	            if ((eShip.getY() + 64) < 0)
+	        	enemy.move();
+	            if ((enemy.getY() + 64) < 0)
 	                iter.remove();
 	            
-	            if(ship.checkShipCollision(eShip.getRectangle())) {
+	            if(ship.checkShipCollision(enemy.getRectangle())) {
 	            	ship.loseHealth();
 	            	shipsDestroyed++;
 	                explosion.play();

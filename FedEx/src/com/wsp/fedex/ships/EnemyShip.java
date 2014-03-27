@@ -1,6 +1,7 @@
 package com.wsp.fedex.ships;
 
 import java.util.Iterator;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,9 +16,12 @@ public class EnemyShip extends Ship {
 	
 	Texture enemyTexture;
 	
+	public boolean readyToShoot;
+	
 	private Sprite enemy;
 	private int velocityY = -200;
 	private int velocityX = 200;
+	private long lastShotTime;
 	private Array<Beam> beams = new Array<Beam>();
 	
 	public EnemyShip() {
@@ -26,18 +30,25 @@ public class EnemyShip extends Ship {
 		enemy = new Sprite(enemyTexture);
 		enemy.setPosition(MathUtils.random(0, 720 - 64),1280);
 	    enemy.setSize(64,64);
+	    
+	    readyToShoot = true;
 	}
 
 	@Override
 	public void shoot() {
 		// TODO Auto-generated method stub
-		Beam beam = new Beam(enemy.getX(), enemy.getY(), velocityX, velocityY - 200);
+		Beam beam = new Beam(enemy.getX() + enemy.getWidth() / 3, enemy.getY() - enemy.getHeight() / 2, velocityX / 2, velocityY - 200);
         beams.add(beam);
+        lastShotTime = TimeUtils.nanoTime();
+        readyToShoot = false;
 	}
 
 	@Override
 	public void move() {
 		// TODO Auto-generated method stub
+		
+		if((TimeUtils.nanoTime() - lastShotTime) > 100000000 * 10) readyToShoot = true;
+		
 		enemy.translateY(velocityY * Gdx.graphics.getDeltaTime());
 		enemy.translateX(velocityX * Gdx.graphics.getDeltaTime());
 		

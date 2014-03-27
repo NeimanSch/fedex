@@ -33,7 +33,7 @@ public class PlayerShip extends Ship {
 	@Override
 	public void shoot() {
 		// TODO Auto-generated method stub
- 		Beam beam = new Beam(player.getX(), player.getY(), velX, velY + 200);
+ 		Beam beam = new Beam(player.getX(), player.getY(), 0, velY + 200);
         beams.add(beam);
 	}
 
