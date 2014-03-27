@@ -2,6 +2,7 @@ package com.wsp.fedex.screens;
 
 
 import java.util.Iterator;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -11,11 +12,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.wsp.fedex.fedex;
@@ -35,19 +32,16 @@ public class GameScreen implements Screen{
 	PlayerShip ship;
 	SpriteBatch batch;
 	Array<EnemyShip> fleet;
-	Array<Sprite> beams;
 	long lastShipTime;
 	long lastBeamTime;
+	long lastEnemyBeamTime;
+	Random randomNum = new Random();
 	int shipsDestroyed;
 	int maxBeams;
 	boolean useAccelerometer = true;
 
-	 public GameScreen(final fedex gam) {
-	        this.game = gam;
-
-	        // load the images for the enemy ships and the player ship, 64x64 pixels each
-	        eship_1 = new Texture(Gdx.files.internal("img/eship_1.png"));
-	        blaster = new Texture(Gdx.files.internal("img/phaser.png"));
+	 public GameScreen(final fedex game) {
+	        this.game = game;    
 
 	        // load the explosion sound effect and the ship engine
 	        explosion = Gdx.audio.newSound(Gdx.files.internal("sound/blasters.wav"));
@@ -66,21 +60,9 @@ public class GameScreen implements Screen{
 	        // create the fleet array and spawn the first ship
 	        fleet = new Array<EnemyShip>();
 	        spawnEnemyShip();
-	        
-	        // Start shooting
-	        beams = new Array<Sprite>();
-	        maxBeams = 25;
 
 	    }
 	 
-	 	private void spawnPhaser() {
-	 		Sprite beam = new Sprite(blaster);
-	        beam.setPosition(ship.getX(), ship.getY());
-	        beam.setSize(32,256);
-	        beams.add(beam);
-	 		lastBeamTime = TimeUtils.nanoTime();
-	 	}
-
 	    private void spawnEnemyShip() {
 	        EnemyShip eShip = new EnemyShip();
 	        fleet.add(eShip);
@@ -104,14 +86,13 @@ public class GameScreen implements Screen{
 	        game.batch.setProjectionMatrix(cam.combined);
 	        game.batch.begin();
 	        game.font.draw(game.batch, "Ships  Destroyed: " + shipsDestroyed, 0, 1280);
+	        game.font.draw(game.batch, "Health: " + ship.getHealth(), 0, 1260);
 	        game.batch.end();
 	        
 	        batch.setProjectionMatrix(cam.combined);
 	        batch.begin();
 	        ship.draw(batch);
-	        for (Sprite beam : beams) {
-	        	beam.draw(batch);
-	        }
+	        
 	        for (EnemyShip eShip : fleet) {
 	            eShip.draw(batch);
 	        }
@@ -119,19 +100,12 @@ public class GameScreen implements Screen{
 
 	        ship.move();
 	        
-	        // keep shooting
-	        if(Gdx.input.isKeyPressed(Keys.SPACE)){
-	        	spawnPhaser();
+	        // shoot on space or touch
+	        if((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched()) && (TimeUtils.nanoTime() - lastBeamTime > 1000000000/5)){
+	        	ship.shoot();
+	        	lastBeamTime = TimeUtils.nanoTime();
 	        }
 
-	        Iterator<Sprite> beam_iter = beams.iterator();
-	        while(beam_iter.hasNext()){
-	        	Sprite beam = beam_iter.next();
-	        	beam.translateY(200 * Gdx.graphics.getDeltaTime());
-	        	if((beam.getY()+64)>1280){
-	        		beam_iter.remove();
-	        	}
-	        }
 	        // check if we need to create a new enemy ship
 	        if (TimeUtils.nanoTime() - lastShipTime > 1000000000)
 	            spawnEnemyShip();
@@ -141,24 +115,28 @@ public class GameScreen implements Screen{
 	        // value our ships destroyed counter and add a sound effect.
 	        Iterator<EnemyShip> iter = fleet.iterator();
 	        while (iter.hasNext()) {
-	        	EnemyShip eShip = iter.next();
-	        	Iterator<Sprite> beam_iter2 = beams.iterator();
-	        	while(beam_iter2.hasNext()){
-		        	Sprite beam2 = beam_iter2.next();
-		        	if (eShip.getRectangle().overlaps(beam2.getBoundingRectangle())) {
-		        		shipsDestroyed++;
-		        		explosion.play();
-		        		iter.remove();
-		        		beam_iter2.remove();
-		        		break;
-		        	}
-		        }
 	        	
-	        	eShip.move();
-	            if ((eShip.getY() + 64) < 0)
+	        	EnemyShip enemy = iter.next();
+	        	if(enemy.readyToShoot) {
+	        		enemy.shoot();
+	        		lastEnemyBeamTime = TimeUtils.nanoTime();
+	        	}
+	        	if(enemy.checkBeamCollision(ship.getBeams())) {
+	        		shipsDestroyed++;
+	        		explosion.play();
+	        		iter.remove();
+	        		break;
+	        	}
+	        	if(ship.checkBeamCollision(enemy.getBeams())) {
+	        		explosion.play();
+	        		ship.loseHealth();
+	        	}
+	        	
+	        	enemy.move();
+	            if ((enemy.getY() + 64) < 0)
 	                iter.remove();
 	            
-	            if(ship.checkShipCollision(eShip.getRectangle())) {
+	            if(ship.checkShipCollision(enemy.getRectangle())) {
 	            	ship.loseHealth();
 	            	shipsDestroyed++;
 	                explosion.play();
